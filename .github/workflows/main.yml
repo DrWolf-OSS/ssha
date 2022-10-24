@@ -1,0 +1,35 @@
+name: Maven Package
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 8
+      uses: actions/setup-java@v3
+      with:  
+          java-version: '8'
+          distribution: 'corretto'
+          cache: maven
+
+    - name: Maven install
+      run: mvn -q install -Dmaven.repo.local=./target/repo -DcreateChecksum=true
+
+    - uses: jakejarvis/s3-sync-action@master
+      name: Upload to S3
+      env:
+        AWS_S3_BUCKET: 'drwolf-maven-public'
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: 'eu-west-1' 
+        SOURCE_DIR: 'target/repo/com/github/drwolf-oss/ssha'
+        DEST_DIR: 'com/github/drwolf-oss/ssha'
