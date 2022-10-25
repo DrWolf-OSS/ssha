@@ -1,3 +1,8 @@
+# DEPRECATED
+
+Use [BCrypt](https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto)
+
+
 # ssha
 secure hash utility
 
